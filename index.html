@@ -103,7 +103,7 @@
 
         const MealPlanner = () => {
             const [familySize, setFamilySize] = useState(4);
-            const [activeView, setActiveView] = useState('planner');
+            const [activeView, setActiveView] = useState('weekly');
             const [expandedSections, setExpandedSections] = useState({
                 breakfast: false,
                 lunch: false,
@@ -452,7 +452,16 @@
                                     />
                                 </div>
                                 
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 flex-wrap">
+                                    <button
+                                        onClick={() => setActiveView('weekly')}
+                                        className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+                                            activeView === 'weekly' ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-700'
+                                        }`}
+                                    >
+                                        <Calendar />
+                                        Weekly
+                                    </button>
                                     <button
                                         onClick={() => setActiveView('planner')}
                                         className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
@@ -460,7 +469,7 @@
                                         }`}
                                     >
                                         <Calendar />
-                                        Planner
+                                        Monthly
                                     </button>
                                     <button
                                         onClick={() => setActiveView('grocery')}
@@ -483,6 +492,163 @@
                                 </div>
                             </div>
                         </div>
+
+                        {activeView === 'weekly' && (
+                            <div className="grid lg:grid-cols-4 gap-6">
+                                {/* Meal Bank */}
+                                <div className="lg:col-span-1">
+                                    <div className="bg-white rounded-xl shadow-lg p-6">
+                                        <h2 className="text-xl font-bold text-gray-800 mb-4">Meal Bank</h2>
+                                        
+                                        {Object.entries(meals).map(([section, sectionMeals]) => (
+                                            <div key={section} className="mb-4">
+                                                <button
+                                                    onClick={() => toggleSection(section)}
+                                                    className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg hover:from-purple-200 hover:to-pink-200 transition-all"
+                                                >
+                                                    <span className="font-semibold text-gray-800 capitalize">{section}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                addNewMeal(section);
+                                                            }}
+                                                            className="p-1 hover:bg-white rounded"
+                                                        >
+                                                            <Plus />
+                                                        </button>
+                                                        {expandedSections[section] ? <ChevronUp /> : <ChevronDown />}
+                                                    </div>
+                                                </button>
+                                                
+                                                {expandedSections[section] && (
+                                                    <div className="mt-2 space-y-2">
+                                                        {sectionMeals.map((meal) => (
+                                                            <div
+                                                                key={meal.id}
+                                                                draggable
+                                                                onDragStart={(e) => handleDragStart(e, meal, section)}
+                                                                className="p-3 bg-gray-50 rounded-lg cursor-move hover:bg-gray-100 transition-colors group"
+                                                            >
+                                                                <div className="flex items-center justify-between">
+                                                                    <span className="text-sm font-medium text-gray-700">{meal.name}</span>
+                                                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                        <button
+                                                                            onClick={() => setEditingMeal({ ...meal, section })}
+                                                                            className="p-1 hover:bg-gray-200 rounded"
+                                                                        >
+                                                                            <Edit3 />
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => deleteMeal(section, meal.id)}
+                                                                            className="p-1 hover:bg-red-200 rounded text-red-600"
+                                                                        >
+                                                                            <Trash2 />
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Weekly Calendar */}
+                                <div className="lg:col-span-3">
+                                    <div className="bg-white rounded-xl shadow-lg p-6">
+                                        <h2 className="text-xl font-bold text-gray-800 mb-4">Weekly Meal Planner</h2>
+                                        
+                                        {/* Day Headers */}
+                                        <div className="grid grid-cols-7 gap-2 mb-4">
+                                            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => (
+                                                <div key={day} className="text-center font-medium text-gray-600 py-2">
+                                                    <div className="hidden md:block">{day}</div>
+                                                    <div className="md:hidden">{day.slice(0, 3)}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        
+                                        {/* Weekly Calendar Grid */}
+                                        <div className="grid grid-cols-7 gap-2">
+                                            {[1, 2, 3, 4, 5, 6, 7].map(day => (
+                                                <div key={day} className="border rounded-lg p-2 min-h-48">
+                                                    <div className="text-xs font-medium text-gray-500 mb-2">Day {day}</div>
+                                                    
+                                                    {/* Breakfast */}
+                                                    <div
+                                                        onDragOver={handleDragOver}
+                                                        onDrop={(e) => handleDrop(e, day, 'breakfast')}
+                                                        className="mb-2 p-2 border-2 border-dashed border-gray-200 rounded min-h-14 text-xs"
+                                                    >
+                                                        <div className="text-xs text-gray-400 mb-1">Breakfast</div>
+                                                        {calendar[`${day}-breakfast`] ? (
+                                                            <div className="bg-yellow-100 rounded p-1 relative group">
+                                                                <div className="font-medium text-xs">{calendar[`${day}-breakfast`].name}</div>
+                                                                <button
+                                                                    onClick={() => removeMealFromCalendar(day, 'breakfast')}
+                                                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                                                                >
+                                                                    <X />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="text-gray-300 text-center text-xs">Drop here</div>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    {/* Lunch */}
+                                                    <div
+                                                        onDragOver={handleDragOver}
+                                                        onDrop={(e) => handleDrop(e, day, 'lunch')}
+                                                        className="mb-2 p-2 border-2 border-dashed border-gray-200 rounded min-h-14 text-xs"
+                                                    >
+                                                        <div className="text-xs text-gray-400 mb-1">Lunch</div>
+                                                        {calendar[`${day}-lunch`] ? (
+                                                            <div className="bg-blue-100 rounded p-1 relative group">
+                                                                <div className="font-medium text-xs">{calendar[`${day}-lunch`].name}</div>
+                                                                <button
+                                                                    onClick={() => removeMealFromCalendar(day, 'lunch')}
+                                                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                                                                >
+                                                                    <X />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="text-gray-300 text-center text-xs">Drop here</div>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    {/* Dinner */}
+                                                    <div
+                                                        onDragOver={handleDragOver}
+                                                        onDrop={(e) => handleDrop(e, day, 'dinner')}
+                                                        className="p-2 border-2 border-dashed border-gray-200 rounded min-h-14 text-xs"
+                                                    >
+                                                        <div className="text-xs text-gray-400 mb-1">Dinner</div>
+                                                        {calendar[`${day}-dinner`] ? (
+                                                            <div className="bg-green-100 rounded p-1 relative group">
+                                                                <div className="font-medium text-xs">{calendar[`${day}-dinner`].name}</div>
+                                                                <button
+                                                                    onClick={() => removeMealFromCalendar(day, 'dinner')}
+                                                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                                                                >
+                                                                    <X />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="text-gray-300 text-center text-xs">Drop here</div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {activeView === 'planner' && (
                             <div className="grid lg:grid-cols-4 gap-6">
