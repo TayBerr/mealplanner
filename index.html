@@ -4,15 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Family Meal Planner</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide-react/0.263.1/umd/lucide-react.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        .icon {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
         }
     </style>
 </head>
@@ -21,18 +27,79 @@
 
     <script type="text/babel">
         const { useState, useEffect } = React;
-        const { 
-            ChevronDown, 
-            ChevronUp, 
-            Edit3, 
-            Plus, 
-            Trash2, 
-            Calendar, 
-            ShoppingCart, 
-            CheckSquare, 
-            X, 
-            Save 
-        } = lucideReact;
+
+        // Simple icon components (replacing lucide-react)
+        const ChevronDown = () => (
+            <svg className="icon" viewBox="0 0 24 24">
+                <polyline points="6,9 12,15 18,9"></polyline>
+            </svg>
+        );
+
+        const ChevronUp = () => (
+            <svg className="icon" viewBox="0 0 24 24">
+                <polyline points="18,15 12,9 6,15"></polyline>
+            </svg>
+        );
+
+        const Edit3 = () => (
+            <svg className="icon" viewBox="0 0 24 24">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+        );
+
+        const Plus = () => (
+            <svg className="icon" viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        );
+
+        const Trash2 = () => (
+            <svg className="icon" viewBox="0 0 24 24">
+                <polyline points="3,6 5,6 21,6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+        );
+
+        const Calendar = () => (
+            <svg className="icon" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+        );
+
+        const ShoppingCart = () => (
+            <svg className="icon" viewBox="0 0 24 24">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+        );
+
+        const CheckSquare = () => (
+            <svg className="icon" viewBox="0 0 24 24">
+                <polyline points="9,11 12,14 22,4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+        );
+
+        const X = () => (
+            <svg className="icon" viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        );
+
+        const Save = () => (
+            <svg className="icon" viewBox="0 0 24 24">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                <polyline points="7,3 7,8 15,8"></polyline>
+            </svg>
+        );
 
         const MealPlanner = () => {
             const [familySize, setFamilySize] = useState(4);
@@ -155,29 +222,6 @@
                     },
                     {
                         id: 'd4',
-                        name: 'Chicken Nuggets',
-                        ingredients: [
-                            { item: 'Chicken Nuggets', amount: 2, unit: 'lbs', category: 'Frozen' },
-                            { item: 'French Fries', amount: 1, unit: 'bag', category: 'Frozen' },
-                            { item: 'Ketchup', amount: 1, unit: 'bottle', category: 'Pantry & Dry Goods' }
-                        ],
-                        prepTasks: ['Preheat oven to 425°F'],
-                        instructions: 'Bake nuggets and fries according to package directions.'
-                    },
-                    {
-                        id: 'd5',
-                        name: 'Pizza',
-                        ingredients: [
-                            { item: 'Pizza Dough', amount: 1, unit: 'ball', category: 'Bakery' },
-                            { item: 'Pizza Sauce', amount: 1, unit: 'jar', category: 'Pantry & Dry Goods' },
-                            { item: 'Mozzarella Cheese', amount: 2, unit: 'cups', category: 'Dairy' },
-                            { item: 'Pepperoni', amount: 1, unit: 'package', category: 'Meat & Seafood' }
-                        ],
-                        prepTasks: ['Let dough come to room temperature'],
-                        instructions: 'Roll dough, add sauce and toppings, bake at 450°F for 12-15 minutes.'
-                    },
-                    {
-                        id: 'd6',
                         name: 'Maidrites',
                         ingredients: [
                             { item: 'Ground Beef', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
@@ -190,171 +234,36 @@
                         instructions: 'Brown ground beef with diced onion, serve loose on buns with mustard and pickles.'
                     },
                     {
-                        id: 'd7',
-                        name: 'Grandma\'s Chicken',
+                        id: 'd5',
+                        name: 'Pizza',
                         ingredients: [
-                            { item: 'Chicken Thighs', amount: 2, unit: 'lbs', category: 'Meat & Seafood' },
-                            { item: 'Flour', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' },
-                            { item: 'Paprika', amount: 1, unit: 'tsp', category: 'Pantry & Dry Goods' },
-                            { item: 'Salt', amount: 1, unit: 'tsp', category: 'Pantry & Dry Goods' },
-                            { item: 'Pepper', amount: 1, unit: 'tsp', category: 'Pantry & Dry Goods' }
+                            { item: 'Pizza Dough', amount: 1, unit: 'ball', category: 'Bakery' },
+                            { item: 'Pizza Sauce', amount: 1, unit: 'jar', category: 'Pantry & Dry Goods' },
+                            { item: 'Mozzarella Cheese', amount: 2, unit: 'cups', category: 'Dairy' },
+                            { item: 'Pepperoni', amount: 1, unit: 'package', category: 'Meat & Seafood' }
                         ],
-                        prepTasks: ['Season chicken overnight', 'Heat oil to 350°F'],
-                        instructions: 'Coat chicken in seasoned flour, fry until golden brown and cooked through.'
-                    },
-                    {
-                        id: 'd8',
-                        name: 'Buffalo Chicken & Potato Casserole',
-                        ingredients: [
-                            { item: 'Chicken Breast', amount: 2, unit: 'lbs', category: 'Meat & Seafood' },
-                            { item: 'Potatoes', amount: 3, unit: 'lbs', category: 'Produce' },
-                            { item: 'Buffalo Sauce', amount: 1, unit: 'bottle', category: 'Pantry & Dry Goods' },
-                            { item: 'Cheddar Cheese', amount: 2, unit: 'cups', category: 'Dairy' },
-                            { item: 'Cream Cheese', amount: 8, unit: 'oz', category: 'Dairy' }
-                        ],
-                        prepTasks: ['Cook and shred chicken', 'Slice potatoes thin'],
-                        instructions: 'Layer potatoes and buffalo chicken, top with cheese, bake at 375°F for 45 minutes.'
-                    },
-                    {
-                        id: 'd9',
-                        name: 'Cheesy Chicken & Rice',
-                        ingredients: [
-                            { item: 'Chicken Breast', amount: 1.5, unit: 'lbs', category: 'Meat & Seafood' },
-                            { item: 'White Rice', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' },
-                            { item: 'Chicken Broth', amount: 4, unit: 'cups', category: 'Pantry & Dry Goods' },
-                            { item: 'Cheddar Cheese', amount: 2, unit: 'cups', category: 'Dairy' },
-                            { item: 'Mixed Vegetables', amount: 1, unit: 'bag', category: 'Frozen' }
-                        ],
-                        prepTasks: ['Cook rice with broth', 'Cut chicken into chunks'],
-                        instructions: 'Combine cooked chicken, rice, vegetables and cheese. Bake until bubbly.'
-                    },
-                    {
-                        id: 'd10',
-                        name: 'Grilled Stuffed Tacos',
-                        ingredients: [
-                            { item: 'Ground Beef', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
-                            { item: 'Large Flour Tortillas', amount: 8, unit: 'tortillas', category: 'Bakery' },
-                            { item: 'Taco Seasoning', amount: 1, unit: 'packet', category: 'Pantry & Dry Goods' },
-                            { item: 'Mexican Cheese Blend', amount: 2, unit: 'cups', category: 'Dairy' },
-                            { item: 'Sour Cream', amount: 1, unit: 'container', category: 'Dairy' }
-                        ],
-                        prepTasks: ['Brown and season ground beef', 'Grate cheese'],
-                        instructions: 'Fill tortillas with beef and cheese, fold and grill until crispy.'
-                    },
-                    {
-                        id: 'd11',
-                        name: 'Nachos',
-                        ingredients: [
-                            { item: 'Tortilla Chips', amount: 1, unit: 'large bag', category: 'Pantry & Dry Goods' },
-                            { item: 'Ground Beef', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
-                            { item: 'Nacho Cheese', amount: 1, unit: 'jar', category: 'Pantry & Dry Goods' },
-                            { item: 'Jalapeños', amount: 1, unit: 'jar', category: 'Pantry & Dry Goods' },
-                            { item: 'Sour Cream', amount: 1, unit: 'container', category: 'Dairy' }
-                        ],
-                        prepTasks: ['Brown ground beef', 'Heat nacho cheese'],
-                        instructions: 'Layer chips with beef and cheese, add toppings.'
-                    },
-                    {
-                        id: 'd12',
-                        name: 'Steak & Potatoes',
-                        ingredients: [
-                            { item: 'Ribeye Steaks', amount: 4, unit: 'steaks', category: 'Meat & Seafood' },
-                            { item: 'Russet Potatoes', amount: 4, unit: 'large', category: 'Produce' },
-                            { item: 'Butter', amount: 4, unit: 'tbsp', category: 'Dairy' },
-                            { item: 'Salt', amount: 1, unit: 'tsp', category: 'Pantry & Dry Goods' },
-                            { item: 'Pepper', amount: 1, unit: 'tsp', category: 'Pantry & Dry Goods' }
-                        ],
-                        prepTasks: ['Bring steaks to room temperature', 'Wash and pierce potatoes'],
-                        instructions: 'Bake potatoes at 425°F for 45 min. Grill steaks to desired doneness.'
-                    },
-                    {
-                        id: 'd13',
-                        name: 'Steak Rice & Gravy',
-                        ingredients: [
-                            { item: 'Cube Steak', amount: 1.5, unit: 'lbs', category: 'Meat & Seafood' },
-                            { item: 'White Rice', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' },
-                            { item: 'Brown Gravy Mix', amount: 2, unit: 'packets', category: 'Pantry & Dry Goods' },
-                            { item: 'Onion', amount: 1, unit: 'medium', category: 'Produce' },
-                            { item: 'Beef Broth', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' }
-                        ],
-                        prepTasks: ['Cook rice', 'Slice onion'],
-                        instructions: 'Brown steak and onions, add broth and gravy mix, simmer. Serve over rice.'
-                    },
-                    {
-                        id: 'd14',
-                        name: 'Italian Beef Sandwiches',
-                        ingredients: [
-                            { item: 'Chuck Roast', amount: 3, unit: 'lbs', category: 'Meat & Seafood' },
-                            { item: 'Italian Seasoning', amount: 2, unit: 'packets', category: 'Pantry & Dry Goods' },
-                            { item: 'Beef Broth', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' },
-                            { item: 'Hoagie Rolls', amount: 6, unit: 'rolls', category: 'Bakery' },
-                            { item: 'Provolone Cheese', amount: 12, unit: 'slices', category: 'Dairy' }
-                        ],
-                        prepTasks: ['Season roast night before', 'Slice rolls'],
-                        instructions: 'Slow cook seasoned roast in broth 8 hours. Shred and serve on rolls with cheese.'
-                    },
-                    {
-                        id: 'd15',
-                        name: 'Hamburger Helper',
-                        ingredients: [
-                            { item: 'Ground Beef', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
-                            { item: 'Hamburger Helper Mix', amount: 1, unit: 'box', category: 'Pantry & Dry Goods' },
-                            { item: 'Milk', amount: 1, unit: 'cup', category: 'Dairy' },
-                            { item: 'Water', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' }
-                        ],
-                        prepTasks: ['Brown ground beef'],
-                        instructions: 'Follow package directions - add water, milk, and sauce mix to browned beef.'
-                    },
-                    {
-                        id: 'd16',
-                        name: 'Fried Chicken Sandwiches',
-                        ingredients: [
-                            { item: 'Chicken Breasts', amount: 4, unit: 'large', category: 'Meat & Seafood' },
-                            { item: 'Flour', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' },
-                            { item: 'Buttermilk', amount: 2, unit: 'cups', category: 'Dairy' },
-                            { item: 'Brioche Buns', amount: 4, unit: 'buns', category: 'Bakery' },
-                            { item: 'Pickle Chips', amount: 1, unit: 'jar', category: 'Pantry & Dry Goods' }
-                        ],
-                        prepTasks: ['Pound chicken thin', 'Marinate in buttermilk'],
-                        instructions: 'Dredge chicken in seasoned flour, fry until golden. Serve on buns with pickles.'
-                    },
-                    {
-                        id: 'd17',
-                        name: 'Chicken Wraps',
-                        ingredients: [
-                            { item: 'Chicken Strips', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
-                            { item: 'Large Tortillas', amount: 4, unit: 'tortillas', category: 'Bakery' },
-                            { item: 'Lettuce', amount: 1, unit: 'head', category: 'Produce' },
-                            { item: 'Tomatoes', amount: 2, unit: 'medium', category: 'Produce' },
-                            { item: 'Ranch Dressing', amount: 1, unit: 'bottle', category: 'Pantry & Dry Goods' }
-                        ],
-                        prepTasks: ['Cook chicken strips', 'Wash and chop vegetables'],
-                        instructions: 'Fill tortillas with chicken, lettuce, tomatoes and ranch. Roll tightly.'
-                    },
-                    {
-                        id: 'd18',
-                        name: 'Chicken Alfredo',
-                        ingredients: [
-                            { item: 'Chicken Breast', amount: 1.5, unit: 'lbs', category: 'Meat & Seafood' },
-                            { item: 'Fettuccine Pasta', amount: 1, unit: 'lb', category: 'Pantry & Dry Goods' },
-                            { item: 'Heavy Cream', amount: 2, unit: 'cups', category: 'Dairy' },
-                            { item: 'Parmesan Cheese', amount: 1, unit: 'cup', category: 'Dairy' },
-                            { item: 'Garlic', amount: 4, unit: 'cloves', category: 'Produce' }
-                        ],
-                        prepTasks: ['Cook pasta al dente', 'Cut chicken into strips'],
-                        instructions: 'Sauté chicken and garlic, add cream and cheese. Toss with cooked pasta.'
+                        prepTasks: ['Let dough come to room temperature'],
+                        instructions: 'Roll dough, add sauce and toppings, bake at 450°F for 12-15 minutes.'
                     }
                 ]
             };
 
             const [meals, setMeals] = useState(() => {
-                const saved = localStorage.getItem('mealPlannerMeals');
-                return saved ? JSON.parse(saved) : initialMeals;
+                try {
+                    const saved = localStorage.getItem('mealPlannerMeals');
+                    return saved ? JSON.parse(saved) : initialMeals;
+                } catch (e) {
+                    return initialMeals;
+                }
             });
 
             const [calendar, setCalendar] = useState(() => {
-                const saved = localStorage.getItem('mealPlannerCalendar');
-                return saved ? JSON.parse(saved) : {};
+                try {
+                    const saved = localStorage.getItem('mealPlannerCalendar');
+                    return saved ? JSON.parse(saved) : {};
+                } catch (e) {
+                    return {};
+                }
             });
 
             const [editingMeal, setEditingMeal] = useState(null);
@@ -362,11 +271,19 @@
 
             // Save to localStorage whenever data changes
             useEffect(() => {
-                localStorage.setItem('mealPlannerMeals', JSON.stringify(meals));
+                try {
+                    localStorage.setItem('mealPlannerMeals', JSON.stringify(meals));
+                } catch (e) {
+                    console.log('Could not save meals to localStorage');
+                }
             }, [meals]);
 
             useEffect(() => {
-                localStorage.setItem('mealPlannerCalendar', JSON.stringify(calendar));
+                try {
+                    localStorage.setItem('mealPlannerCalendar', JSON.stringify(calendar));
+                } catch (e) {
+                    console.log('Could not save calendar to localStorage');
+                }
             }, [calendar]);
 
             const toggleSection = (section) => {
@@ -508,377 +425,279 @@
             const days = generateCalendarDays();
 
             if (editingMeal) {
-                return React.createElement(EditMealForm, {
-                    meal: editingMeal,
-                    onSave: editingMeal.id.includes(Date.now()) ? saveNewMeal : saveMeal,
-                    onCancel: () => setEditingMeal(null)
-                });
+                return <EditMealForm 
+                    meal={editingMeal} 
+                    onSave={editingMeal.id.includes(Date.now()) ? saveNewMeal : saveMeal}
+                    onCancel={() => setEditingMeal(null)}
+                />;
             }
 
-            return React.createElement('div', {
-                className: "min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4"
-            }, 
-                React.createElement('div', {
-                    className: "max-w-7xl mx-auto"
-                },
-                    // Header
-                    React.createElement('div', {
-                        className: "bg-white rounded-xl shadow-lg p-6 mb-6"
-                    },
-                        React.createElement('h1', {
-                            className: "text-3xl font-bold text-gray-800 mb-4"
-                        }, "Family Meal Planner"),
-                        
-                        React.createElement('div', {
-                            className: "flex flex-wrap gap-4 items-center justify-between"
-                        },
-                            React.createElement('div', {
-                                className: "flex items-center gap-2"
-                            },
-                                React.createElement('label', {
-                                    className: "text-sm font-medium text-gray-600"
-                                }, "Family Size:"),
-                                React.createElement('input', {
-                                    type: "number",
-                                    value: familySize,
-                                    onChange: (e) => setFamilySize(parseInt(e.target.value) || 1),
-                                    className: "w-16 px-2 py-1 border border-gray-300 rounded-md text-center",
-                                    min: "1",
-                                    max: "20"
-                                })
-                            ),
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
+                    <div className="max-w-7xl mx-auto">
+                        {/* Header */}
+                        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                            <h1 className="text-3xl font-bold text-gray-800 mb-4">Family Meal Planner</h1>
                             
-                            React.createElement('div', {
-                                className: "flex gap-2"
-                            },
-                                React.createElement('button', {
-                                    onClick: () => setActiveView('planner'),
-                                    className: `px-4 py-2 rounded-lg flex items-center gap-2 ${
-                                        activeView === 'planner' ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-700'
-                                    }`
-                                },
-                                    React.createElement(Calendar, { size: 16 }),
-                                    "Planner"
-                                ),
-                                React.createElement('button', {
-                                    onClick: () => setActiveView('grocery'),
-                                    className: `px-4 py-2 rounded-lg flex items-center gap-2 ${
-                                        activeView === 'grocery' ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-700'
-                                    }`
-                                },
-                                    React.createElement(ShoppingCart, { size: 16 }),
-                                    "Grocery List"
-                                ),
-                                React.createElement('button', {
-                                    onClick: () => setActiveView('prep'),
-                                    className: `px-4 py-2 rounded-lg flex items-center gap-2 ${
-                                        activeView === 'prep' ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-700'
-                                    }`
-                                },
-                                    React.createElement(CheckSquare, { size: 16 }),
-                                    "Prep Tasks"
-                                )
-                            )
-                        )
-                    ),
-
-                    // Planner View
-                    activeView === 'planner' && React.createElement('div', {
-                        className: "grid lg:grid-cols-4 gap-6"
-                    },
-                        // Meal Bank
-                        React.createElement('div', {
-                            className: "lg:col-span-1"
-                        },
-                            React.createElement('div', {
-                                className: "bg-white rounded-xl shadow-lg p-6"
-                            },
-                                React.createElement('h2', {
-                                    className: "text-xl font-bold text-gray-800 mb-4"
-                                }, "Meal Bank"),
+                            <div className="flex flex-wrap gap-4 items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-sm font-medium text-gray-600">Family Size:</label>
+                                    <input
+                                        type="number"
+                                        value={familySize}
+                                        onChange={(e) => setFamilySize(parseInt(e.target.value) || 1)}
+                                        className="w-16 px-2 py-1 border border-gray-300 rounded-md text-center"
+                                        min="1"
+                                        max="20"
+                                    />
+                                </div>
                                 
-                                Object.entries(meals).map(([section, sectionMeals]) =>
-                                    React.createElement('div', {
-                                        key: section,
-                                        className: "mb-4"
-                                    },
-                                        React.createElement('button', {
-                                            onClick: () => toggleSection(section),
-                                            className: "w-full flex items-center justify-between p-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg hover:from-purple-200 hover:to-pink-200 transition-all"
-                                        },
-                                            React.createElement('span', {
-                                                className: "font-semibold text-gray-800 capitalize"
-                                            }, section),
-                                            React.createElement('div', {
-                                                className: "flex items-center gap-2"
-                                            },
-                                                React.createElement('button', {
-                                                    onClick: (e) => {
-                                                        e.stopPropagation();
-                                                        addNewMeal(section);
-                                                    },
-                                                    className: "p-1 hover:bg-white rounded"
-                                                },
-                                                    React.createElement(Plus, { size: 16 })
-                                                ),
-                                                expandedSections[section] ? 
-                                                    React.createElement(ChevronUp, { size: 20 }) : 
-                                                    React.createElement(ChevronDown, { size: 20 })
-                                            )
-                                        ),
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setActiveView('planner')}
+                                        className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+                                            activeView === 'planner' ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-700'
+                                        }`}
+                                    >
+                                        <Calendar />
+                                        Planner
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveView('grocery')}
+                                        className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+                                            activeView === 'grocery' ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-700'
+                                        }`}
+                                    >
+                                        <ShoppingCart />
+                                        Grocery List
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveView('prep')}
+                                        className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+                                            activeView === 'prep' ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-700'
+                                        }`}
+                                    >
+                                        <CheckSquare />
+                                        Prep Tasks
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {activeView === 'planner' && (
+                            <div className="grid lg:grid-cols-4 gap-6">
+                                {/* Meal Bank */}
+                                <div className="lg:col-span-1">
+                                    <div className="bg-white rounded-xl shadow-lg p-6">
+                                        <h2 className="text-xl font-bold text-gray-800 mb-4">Meal Bank</h2>
                                         
-                                        expandedSections[section] && React.createElement('div', {
-                                            className: "mt-2 space-y-2"
-                                        },
-                                            sectionMeals.map((meal) =>
-                                                React.createElement('div', {
-                                                    key: meal.id,
-                                                    draggable: true,
-                                                    onDragStart: (e) => handleDragStart(e, meal, section),
-                                                    className: "p-3 bg-gray-50 rounded-lg cursor-move hover:bg-gray-100 transition-colors group"
-                                                },
-                                                    React.createElement('div', {
-                                                        className: "flex items-center justify-between"
-                                                    },
-                                                        React.createElement('span', {
-                                                            className: "text-sm font-medium text-gray-700"
-                                                        }, meal.name),
-                                                        React.createElement('div', {
-                                                            className: "flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        },
-                                                            React.createElement('button', {
-                                                                onClick: () => setEditingMeal({ ...meal, section }),
-                                                                className: "p-1 hover:bg-gray-200 rounded"
-                                                            },
-                                                                React.createElement(Edit3, { size: 12 })
-                                                            ),
-                                                            React.createElement('button', {
-                                                                onClick: () => deleteMeal(section, meal.id),
-                                                                className: "p-1 hover:bg-red-200 rounded text-red-600"
-                                                            },
-                                                                React.createElement(Trash2, { size: 12 })
-                                                            )
-                                                        )
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        ),
-
-                        // Calendar
-                        React.createElement('div', {
-                            className: "lg:col-span-3"
-                        },
-                            React.createElement('div', {
-                                className: "bg-white rounded-xl shadow-lg p-6"
-                            },
-                                React.createElement('h2', {
-                                    className: "text-xl font-bold text-gray-800 mb-4"
-                                }, "Monthly Meal Calendar"),
-                                
-                                // Breakfast/Lunch Week
-                                React.createElement('div', {
-                                    className: "mb-6"
-                                },
-                                    React.createElement('h3', {
-                                        className: "text-lg font-semibold text-gray-700 mb-3"
-                                    }, "Week 1 - Breakfast & Lunch"),
-                                    React.createElement('div', {
-                                        className: "grid grid-cols-7 gap-2 mb-4"
-                                    },
-                                        ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day =>
-                                            React.createElement('div', {
-                                                key: day,
-                                                className: "text-center font-medium text-gray-600 py-2"
-                                            }, day)
-                                        )
-                                    ),
-                                    
-                                    React.createElement('div', {
-                                        className: "grid grid-cols-7 gap-2"
-                                    },
-                                        days.slice(0, 7).map(day =>
-                                            React.createElement('div', {
-                                                key: day,
-                                                className: "border rounded-lg p-2 min-h-32"
-                                            },
-                                                React.createElement('div', {
-                                                    className: "text-xs font-medium text-gray-500 mb-2"
-                                                }, `Day ${day}`),
+                                        {Object.entries(meals).map(([section, sectionMeals]) => (
+                                            <div key={section} className="mb-4">
+                                                <button
+                                                    onClick={() => toggleSection(section)}
+                                                    className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg hover:from-purple-200 hover:to-pink-200 transition-all"
+                                                >
+                                                    <span className="font-semibold text-gray-800 capitalize">{section}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                addNewMeal(section);
+                                                            }}
+                                                            className="p-1 hover:bg-white rounded"
+                                                        >
+                                                            <Plus />
+                                                        </button>
+                                                        {expandedSections[section] ? <ChevronUp /> : <ChevronDown />}
+                                                    </div>
+                                                </button>
                                                 
-                                                React.createElement('div', {
-                                                    onDragOver: handleDragOver,
-                                                    onDrop: (e) => handleDrop(e, day, 'breakfast'),
-                                                    className: "mb-2 p-1 border-2 border-dashed border-gray-200 rounded min-h-12 text-xs"
-                                                },
-                                                    calendar[`${day}-breakfast`] ?
-                                                        React.createElement('div', {
-                                                            className: "bg-yellow-100 rounded p-1 relative group"
-                                                        },
-                                                            React.createElement('div', {
-                                                                className: "font-medium"
-                                                            }, calendar[`${day}-breakfast`].name),
-                                                            React.createElement('button', {
-                                                                onClick: () => removeMealFromCalendar(day, 'breakfast'),
-                                                                className: "absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
-                                                            },
-                                                                React.createElement(X, { size: 10 })
-                                                            )
-                                                        ) :
-                                                        React.createElement('div', {
-                                                            className: "text-gray-400 text-center"
-                                                        }, "Breakfast")
-                                                ),
-                                                
-                                                React.createElement('div', {
-                                                    onDragOver: handleDragOver,
-                                                    onDrop: (e) => handleDrop(e, day, 'lunch'),
-                                                    className: "p-1 border-2 border-dashed border-gray-200 rounded min-h-12 text-xs"
-                                                },
-                                                    calendar[`${day}-lunch`] ?
-                                                        React.createElement('div', {
-                                                            className: "bg-blue-100 rounded p-1 relative group"
-                                                        },
-                                                            React.createElement('div', {
-                                                                className: "font-medium"
-                                                            }, calendar[`${day}-lunch`].name),
-                                                            React.createElement('button', {
-                                                                onClick: () => removeMealFromCalendar(day, 'lunch'),
-                                                                className: "absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
-                                                            },
-                                                                React.createElement(X, { size: 10 })
-                                                            )
-                                                        ) :
-                                                        React.createElement('div', {
-                                                            className: "text-gray-400 text-center"
-                                                        }, "Lunch")
-                                                )
-                                            )
-                                        )
-                                    )
-                                ),
+                                                {expandedSections[section] && (
+                                                    <div className="mt-2 space-y-2">
+                                                        {sectionMeals.map((meal) => (
+                                                            <div
+                                                                key={meal.id}
+                                                                draggable
+                                                                onDragStart={(e) => handleDragStart(e, meal, section)}
+                                                                className="p-3 bg-gray-50 rounded-lg cursor-move hover:bg-gray-100 transition-colors group"
+                                                            >
+                                                                <div className="flex items-center justify-between">
+                                                                    <span className="text-sm font-medium text-gray-700">{meal.name}</span>
+                                                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                        <button
+                                                                            onClick={() => setEditingMeal({ ...meal, section })}
+                                                                            className="p-1 hover:bg-gray-200 rounded"
+                                                                        >
+                                                                            <Edit3 />
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => deleteMeal(section, meal.id)}
+                                                                            className="p-1 hover:bg-red-200 rounded text-red-600"
+                                                                        >
+                                                                            <Trash2 />
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
 
-                                // Dinner Weeks
-                                [0, 1, 2, 3].map(weekIndex =>
-                                    React.createElement('div', {
-                                        key: weekIndex,
-                                        className: "mb-6"
-                                    },
-                                        React.createElement('h3', {
-                                            className: "text-lg font-semibold text-gray-700 mb-3"
-                                        }, `Week ${weekIndex + 1} - Dinners`),
-                                        React.createElement('div', {
-                                            className: "grid grid-cols-7 gap-2"
-                                        },
-                                            days.slice(weekIndex * 7, (weekIndex + 1) * 7).map(day =>
-                                                React.createElement('div', {
-                                                    key: day,
-                                                    className: "border rounded-lg p-2 min-h-20"
-                                                },
-                                                    React.createElement('div', {
-                                                        className: "text-xs font-medium text-gray-500 mb-2"
-                                                    }, `Day ${day}`),
-                                                    React.createElement('div', {
-                                                        onDragOver: handleDragOver,
-                                                        onDrop: (e) => handleDrop(e, day, 'dinner'),
-                                                        className: "p-1 border-2 border-dashed border-gray-200 rounded min-h-12 text-xs"
-                                                    },
-                                                        calendar[`${day}-dinner`] ?
-                                                            React.createElement('div', {
-                                                                className: "bg-green-100 rounded p-1 relative group"
-                                                            },
-                                                                React.createElement('div', {
-                                                                    className: "font-medium"
-                                                                }, calendar[`${day}-dinner`].name),
-                                                                React.createElement('button', {
-                                                                    onClick: () => removeMealFromCalendar(day, 'dinner'),
-                                                                    className: "absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
-                                                                },
-                                                                    React.createElement(X, { size: 10 })
-                                                                )
-                                                            ) :
-                                                            React.createElement('div', {
-                                                                className: "text-gray-400 text-center"
-                                                            }, "Dinner")
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    ),
+                                {/* Calendar */}
+                                <div className="lg:col-span-3">
+                                    <div className="bg-white rounded-xl shadow-lg p-6">
+                                        <h2 className="text-xl font-bold text-gray-800 mb-4">Monthly Meal Calendar</h2>
+                                        
+                                        {/* Breakfast/Lunch Week */}
+                                        <div className="mb-6">
+                                            <h3 className="text-lg font-semibold text-gray-700 mb-3">Week 1 - Breakfast & Lunch</h3>
+                                            <div className="grid grid-cols-7 gap-2 mb-4">
+                                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                                                    <div key={day} className="text-center font-medium text-gray-600 py-2">
+                                                        {day}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-7 gap-2">
+                                                {days.slice(0, 7).map(day => (
+                                                    <div key={day} className="border rounded-lg p-2 min-h-32">
+                                                        <div className="text-xs font-medium text-gray-500 mb-2">Day {day}</div>
+                                                        
+                                                        <div
+                                                            onDragOver={handleDragOver}
+                                                            onDrop={(e) => handleDrop(e, day, 'breakfast')}
+                                                            className="mb-2 p-1 border-2 border-dashed border-gray-200 rounded min-h-12 text-xs"
+                                                        >
+                                                            {calendar[`${day}-breakfast`] ? (
+                                                                <div className="bg-yellow-100 rounded p-1 relative group">
+                                                                    <div className="font-medium">{calendar[`${day}-breakfast`].name}</div>
+                                                                    <button
+                                                                        onClick={() => removeMealFromCalendar(day, 'breakfast')}
+                                                                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                                                                    >
+                                                                        <X />
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="text-gray-400 text-center">Breakfast</div>
+                                                            )}
+                                                        </div>
+                                                        
+                                                        <div
+                                                            onDragOver={handleDragOver}
+                                                            onDrop={(e) => handleDrop(e, day, 'lunch')}
+                                                            className="p-1 border-2 border-dashed border-gray-200 rounded min-h-12 text-xs"
+                                                        >
+                                                            {calendar[`${day}-lunch`] ? (
+                                                                <div className="bg-blue-100 rounded p-1 relative group">
+                                                                    <div className="font-medium">{calendar[`${day}-lunch`].name}</div>
+                                                                    <button
+                                                                        onClick={() => removeMealFromCalendar(day, 'lunch')}
+                                                                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                                                                    >
+                                                                        <X />
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="text-gray-400 text-center">Lunch</div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
 
-                    // Grocery List View
-                    activeView === 'grocery' && React.createElement('div', {
-                        className: "bg-white rounded-xl shadow-lg p-6"
-                    },
-                        React.createElement('h2', {
-                            className: "text-xl font-bold text-gray-800 mb-4"
-                        }, `Grocery List (Family of ${familySize})`),
-                        Object.entries(generateGroceryList()).map(([category, items]) =>
-                            React.createElement('div', {
-                                key: category,
-                                className: "mb-6"
-                            },
-                                React.createElement('h3', {
-                                    className: "text-lg font-semibold text-purple-600 mb-3"
-                                }, category),
-                                React.createElement('div', {
-                                    className: "grid md:grid-cols-2 gap-2"
-                                },
-                                    items.map((item, index) =>
-                                        React.createElement('div', {
-                                            key: index,
-                                            className: "flex items-center justify-between p-2 bg-gray-50 rounded"
-                                        },
-                                            React.createElement('span', null, item.item),
-                                            React.createElement('span', {
-                                                className: "text-sm text-gray-600"
-                                            }, `${item.amount.toFixed(item.amount < 1 ? 2 : 1)} ${item.unit}`)
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    ),
+                                        {/* Dinner Weeks */}
+                                        {[0, 1, 2, 3].map(weekIndex => (
+                                            <div key={weekIndex} className="mb-6">
+                                                <h3 className="text-lg font-semibold text-gray-700 mb-3">Week {weekIndex + 1} - Dinners</h3>
+                                                <div className="grid grid-cols-7 gap-2">
+                                                    {days.slice(weekIndex * 7, (weekIndex + 1) * 7).map(day => (
+                                                        <div key={day} className="border rounded-lg p-2 min-h-20">
+                                                            <div className="text-xs font-medium text-gray-500 mb-2">Day {day}</div>
+                                                            <div
+                                                                onDragOver={handleDragOver}
+                                                                onDrop={(e) => handleDrop(e, day, 'dinner')}
+                                                                className="p-1 border-2 border-dashed border-gray-200 rounded min-h-12 text-xs"
+                                                            >
+                                                                {calendar[`${day}-dinner`] ? (
+                                                                    <div className="bg-green-100 rounded p-1 relative group">
+                                                                        <div className="font-medium">{calendar[`${day}-dinner`].name}</div>
+                                                                        <button
+                                                                            onClick={() => removeMealFromCalendar(day, 'dinner')}
+                                                                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                                                                        >
+                                                                            <X />
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="text-gray-400 text-center">Dinner</div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
-                    // Prep Tasks View
-                    activeView === 'prep' && React.createElement('div', {
-                        className: "bg-white rounded-xl shadow-lg p-6"
-                    },
-                        React.createElement('h2', {
-                            className: "text-xl font-bold text-gray-800 mb-4"
-                        }, "Prep Tasks"),
-                        React.createElement('div', {
-                            className: "space-y-4"
-                        },
-                            generatePrepTasks().map((task) =>
-                                React.createElement('div', {
-                                    key: task.id,
-                                    className: "flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                                },
-                                    React.createElement('div', null,
-                                        React.createElement('div', {
-                                            className: "font-medium"
-                                        }, task.task),
-                                        React.createElement('div', {
-                                            className: "text-sm text-gray-600"
-                                        }, `Day ${task.day} - ${task.meal} (${task.mealType})`)
-                                    ),
-                                    React.createElement('input', {
-                                        type: "checkbox",
-                                        className: "w-5 h-5 text-purple-600"
-                                    })
-                                )
-                            )
-                        )
-                    )
-                )
+                        {activeView === 'grocery' && (
+                            <div className="bg-white rounded-xl shadow-lg p-6">
+                                <h2 className="text-xl font-bold text-gray-800 mb-4">Grocery List (Family of {familySize})</h2>
+                                {Object.entries(generateGroceryList()).length === 0 ? (
+                                    <p className="text-gray-500">Add meals to your calendar to generate a grocery list!</p>
+                                ) : (
+                                    Object.entries(generateGroceryList()).map(([category, items]) => (
+                                        <div key={category} className="mb-6">
+                                            <h3 className="text-lg font-semibold text-purple-600 mb-3">{category}</h3>
+                                            <div className="grid md:grid-cols-2 gap-2">
+                                                {items.map((item, index) => (
+                                                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                                        <span>{item.item}</span>
+                                                        <span className="text-sm text-gray-600">
+                                                            {item.amount.toFixed(item.amount < 1 ? 2 : 1)} {item.unit}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+
+                        {activeView === 'prep' && (
+                            <div className="bg-white rounded-xl shadow-lg p-6">
+                                <h2 className="text-xl font-bold text-gray-800 mb-4">Prep Tasks</h2>
+                                {generatePrepTasks().length === 0 ? (
+                                    <p className="text-gray-500">Add meals to your calendar to see prep tasks!</p>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {generatePrepTasks().map((task) => (
+                                            <div key={task.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                <div>
+                                                    <div className="font-medium">{task.task}</div>
+                                                    <div className="text-sm text-gray-600">
+                                                        Day {task.day} - {task.meal} ({task.mealType})
+                                                    </div>
+                                                </div>
+                                                <input type="checkbox" className="w-5 h-5 text-purple-600" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
             );
         };
 
@@ -928,184 +747,149 @@
 
             const categories = ['Produce', 'Meat & Seafood', 'Dairy', 'Frozen', 'Pantry & Dry Goods', 'Bakery'];
 
-            return React.createElement('div', {
-                className: "min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4"
-            },
-                React.createElement('div', {
-                    className: "max-w-4xl mx-auto"
-                },
-                    React.createElement('div', {
-                        className: "bg-white rounded-xl shadow-lg p-6"
-                    },
-                        React.createElement('div', {
-                            className: "flex items-center justify-between mb-6"
-                        },
-                            React.createElement('h2', {
-                                className: "text-2xl font-bold text-gray-800"
-                            }, "Edit Meal"),
-                            React.createElement('div', {
-                                className: "flex gap-2"
-                            },
-                                React.createElement('button', {
-                                    onClick: () => onSave(formData),
-                                    className: "px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2 hover:bg-purple-600"
-                                },
-                                    React.createElement(Save, { size: 16 }),
-                                    "Save"
-                                ),
-                                React.createElement('button', {
-                                    onClick: onCancel,
-                                    className: "px-4 py-2 bg-gray-300 text-gray-700 rounded-lg"
-                                }, "Cancel")
-                            )
-                        ),
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-2xl font-bold text-gray-800">Edit Meal</h2>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => onSave(formData)}
+                                        className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2 hover:bg-purple-600"
+                                    >
+                                        <Save />
+                                        Save
+                                    </button>
+                                    <button
+                                        onClick={onCancel}
+                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
 
-                        React.createElement('div', {
-                            className: "space-y-6"
-                        },
-                            // Meal Name
-                            React.createElement('div', null,
-                                React.createElement('label', {
-                                    className: "block text-sm font-medium text-gray-700 mb-2"
-                                }, "Meal Name"),
-                                React.createElement('input', {
-                                    type: "text",
-                                    value: formData.name,
-                                    onChange: (e) => setFormData({ ...formData, name: e.target.value }),
-                                    className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                })
-                            ),
+                            <div className="space-y-6">
+                                {/* Meal Name */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Meal Name</label>
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    />
+                                </div>
 
-                            // Ingredients
-                            React.createElement('div', null,
-                                React.createElement('div', {
-                                    className: "flex items-center justify-between mb-3"
-                                },
-                                    React.createElement('label', {
-                                        className: "block text-sm font-medium text-gray-700"
-                                    }, "Ingredients"),
-                                    React.createElement('button', {
-                                        onClick: addIngredient,
-                                        className: "px-3 py-1 bg-purple-500 text-white rounded text-sm flex items-center gap-1"
-                                    },
-                                        React.createElement(Plus, { size: 14 }),
-                                        "Add"
-                                    )
-                                ),
-                                React.createElement('div', {
-                                    className: "space-y-3"
-                                },
-                                    formData.ingredients.map((ingredient, index) =>
-                                        React.createElement('div', {
-                                            key: index,
-                                            className: "grid grid-cols-1 md:grid-cols-5 gap-2 items-center"
-                                        },
-                                            React.createElement('input', {
-                                                type: "text",
-                                                placeholder: "Item",
-                                                value: ingredient.item,
-                                                onChange: (e) => updateIngredient(index, 'item', e.target.value),
-                                                className: "px-2 py-2 border border-gray-300 rounded-md text-sm"
-                                            }),
-                                            React.createElement('input', {
-                                                type: "number",
-                                                placeholder: "Amount",
-                                                value: ingredient.amount,
-                                                onChange: (e) => updateIngredient(index, 'amount', parseFloat(e.target.value) || 0),
-                                                className: "px-2 py-2 border border-gray-300 rounded-md text-sm"
-                                            }),
-                                            React.createElement('input', {
-                                                type: "text",
-                                                placeholder: "Unit",
-                                                value: ingredient.unit,
-                                                onChange: (e) => updateIngredient(index, 'unit', e.target.value),
-                                                className: "px-2 py-2 border border-gray-300 rounded-md text-sm"
-                                            }),
-                                            React.createElement('select', {
-                                                value: ingredient.category,
-                                                onChange: (e) => updateIngredient(index, 'category', e.target.value),
-                                                className: "px-2 py-2 border border-gray-300 rounded-md text-sm"
-                                            },
-                                                categories.map(cat =>
-                                                    React.createElement('option', {
-                                                        key: cat,
-                                                        value: cat
-                                                    }, cat)
-                                                )
-                                            ),
-                                            React.createElement('button', {
-                                                onClick: () => removeIngredient(index),
-                                                className: "px-2 py-2 bg-red-500 text-white rounded-md text-sm"
-                                            },
-                                                React.createElement(Trash2, { size: 14 })
-                                            )
-                                        )
-                                    )
-                                )
-                            ),
+                                {/* Ingredients */}
+                                <div>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <label className="block text-sm font-medium text-gray-700">Ingredients</label>
+                                        <button
+                                            onClick={addIngredient}
+                                            className="px-3 py-1 bg-purple-500 text-white rounded text-sm flex items-center gap-1"
+                                        >
+                                            <Plus />
+                                            Add
+                                        </button>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {formData.ingredients.map((ingredient, index) => (
+                                            <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-2 items-center">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Item"
+                                                    value={ingredient.item}
+                                                    onChange={(e) => updateIngredient(index, 'item', e.target.value)}
+                                                    className="px-2 py-2 border border-gray-300 rounded-md text-sm"
+                                                />
+                                                <input
+                                                    type="number"
+                                                    placeholder="Amount"
+                                                    value={ingredient.amount}
+                                                    onChange={(e) => updateIngredient(index, 'amount', parseFloat(e.target.value) || 0)}
+                                                    className="px-2 py-2 border border-gray-300 rounded-md text-sm"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Unit"
+                                                    value={ingredient.unit}
+                                                    onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
+                                                    className="px-2 py-2 border border-gray-300 rounded-md text-sm"
+                                                />
+                                                <select
+                                                    value={ingredient.category}
+                                                    onChange={(e) => updateIngredient(index, 'category', e.target.value)}
+                                                    className="px-2 py-2 border border-gray-300 rounded-md text-sm"
+                                                >
+                                                    {categories.map(cat => (
+                                                        <option key={cat} value={cat}>{cat}</option>
+                                                    ))}
+                                                </select>
+                                                <button
+                                                    onClick={() => removeIngredient(index)}
+                                                    className="px-2 py-2 bg-red-500 text-white rounded-md text-sm"
+                                                >
+                                                    <Trash2 />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
 
-                            // Prep Tasks
-                            React.createElement('div', null,
-                                React.createElement('div', {
-                                    className: "flex items-center justify-between mb-3"
-                                },
-                                    React.createElement('label', {
-                                        className: "block text-sm font-medium text-gray-700"
-                                    }, "Prep Tasks"),
-                                    React.createElement('button', {
-                                        onClick: addPrepTask,
-                                        className: "px-3 py-1 bg-purple-500 text-white rounded text-sm flex items-center gap-1"
-                                    },
-                                        React.createElement(Plus, { size: 14 }),
-                                        "Add"
-                                    )
-                                ),
-                                React.createElement('div', {
-                                    className: "space-y-2"
-                                },
-                                    formData.prepTasks.map((task, index) =>
-                                        React.createElement('div', {
-                                            key: index,
-                                            className: "flex gap-2 items-center"
-                                        },
-                                            React.createElement('input', {
-                                                type: "text",
-                                                placeholder: "Prep task",
-                                                value: task,
-                                                onChange: (e) => updatePrepTask(index, e.target.value),
-                                                className: "flex-1 px-2 py-2 border border-gray-300 rounded-md text-sm"
-                                            }),
-                                            React.createElement('button', {
-                                                onClick: () => removePrepTask(index),
-                                                className: "px-2 py-2 bg-red-500 text-white rounded-md text-sm"
-                                            },
-                                                React.createElement(Trash2, { size: 14 })
-                                            )
-                                        )
-                                    )
-                                )
-                            ),
+                                {/* Prep Tasks */}
+                                <div>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <label className="block text-sm font-medium text-gray-700">Prep Tasks</label>
+                                        <button
+                                            onClick={addPrepTask}
+                                            className="px-3 py-1 bg-purple-500 text-white rounded text-sm flex items-center gap-1"
+                                        >
+                                            <Plus />
+                                            Add
+                                        </button>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {formData.prepTasks.map((task, index) => (
+                                            <div key={index} className="flex gap-2 items-center">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Prep task"
+                                                    value={task}
+                                                    onChange={(e) => updatePrepTask(index, e.target.value)}
+                                                    className="flex-1 px-2 py-2 border border-gray-300 rounded-md text-sm"
+                                                />
+                                                <button
+                                                    onClick={() => removePrepTask(index)}
+                                                    className="px-2 py-2 bg-red-500 text-white rounded-md text-sm"
+                                                >
+                                                    <Trash2 />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
 
-                            // Instructions
-                            React.createElement('div', null,
-                                React.createElement('label', {
-                                    className: "block text-sm font-medium text-gray-700 mb-2"
-                                }, "Instructions"),
-                                React.createElement('textarea', {
-                                    value: formData.instructions,
-                                    onChange: (e) => setFormData({ ...formData, instructions: e.target.value }),
-                                    rows: 4,
-                                    className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500",
-                                    placeholder: "Cooking instructions..."
-                                })
-                            )
-                        )
-                    )
-                )
+                                {/* Instructions */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Instructions</label>
+                                    <textarea
+                                        value={formData.instructions}
+                                        onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+                                        rows={4}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                        placeholder="Cooking instructions..."
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             );
         };
 
-        ReactDOM.render(React.createElement(MealPlanner), document.getElementById('root'));
+        ReactDOM.render(<MealPlanner />, document.getElementById('root'));
     </script>
 </body>
 </html>
