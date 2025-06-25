@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Meal Planner</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide-react/0.263.1/umd/lucide-react.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { 
+            ChevronDown, 
+            ChevronUp, 
+            Edit3, 
+            Plus, 
+            Trash2, 
+            Calendar, 
+            ShoppingCart, 
+            CheckSquare, 
+            X, 
+            Save 
+        } = lucideReact;
+
+        const MealPlanner = () => {
+            const [familySize, setFamilySize] = useState(4);
+            const [activeView, setActiveView] = useState('planner');
+            const [expandedSections, setExpandedSections] = useState({
+                breakfast: false,
+                lunch: false,
+                dinner: true
+            });
+
+            // Initial meal data
+            const initialMeals = {
+                breakfast: [
+                    {
+                        id: 'b1',
+                        name: 'Pancakes',
+                        ingredients: [
+                            { item: 'Pancake Mix', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' },
+                            { item: 'Eggs', amount: 2, unit: 'large', category: 'Dairy' },
+                            { item: 'Milk', amount: 1, unit: 'cup', category: 'Dairy' },
+                            { item: 'Butter', amount: 2, unit: 'tbsp', category: 'Dairy' },
+                            { item: 'Maple Syrup', amount: 1, unit: 'bottle', category: 'Pantry & Dry Goods' }
+                        ],
+                        prepTasks: ['Mix batter the night before', 'Heat griddle to 350°F'],
+                        instructions: 'Mix ingredients, cook on griddle until bubbles form, flip once.'
+                    },
+                    {
+                        id: 'b2',
+                        name: 'Scrambled Eggs & Toast',
+                        ingredients: [
+                            { item: 'Eggs', amount: 8, unit: 'large', category: 'Dairy' },
+                            { item: 'Bread', amount: 1, unit: 'loaf', category: 'Bakery' },
+                            { item: 'Butter', amount: 3, unit: 'tbsp', category: 'Dairy' },
+                            { item: 'Salt', amount: 1, unit: 'tsp', category: 'Pantry & Dry Goods' }
+                        ],
+                        prepTasks: ['Set out eggs to room temperature'],
+                        instructions: 'Scramble eggs in butter, serve with toasted bread.'
+                    },
+                    {
+                        id: 'b3',
+                        name: 'Cereal & Milk',
+                        ingredients: [
+                            { item: 'Cereal', amount: 1, unit: 'box', category: 'Pantry & Dry Goods' },
+                            { item: 'Milk', amount: 0.5, unit: 'gallon', category: 'Dairy' }
+                        ],
+                        prepTasks: [],
+                        instructions: 'Pour cereal in bowl, add milk.'
+                    }
+                ],
+                lunch: [
+                    {
+                        id: 'l1',
+                        name: 'BLT Sandwiches',
+                        ingredients: [
+                            { item: 'Bacon', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
+                            { item: 'Lettuce', amount: 1, unit: 'head', category: 'Produce' },
+                            { item: 'Tomatoes', amount: 2, unit: 'large', category: 'Produce' },
+                            { item: 'Bread', amount: 1, unit: 'loaf', category: 'Bakery' },
+                            { item: 'Mayo', amount: 1, unit: 'jar', category: 'Pantry & Dry Goods' }
+                        ],
+                        prepTasks: ['Cook bacon until crispy', 'Slice tomatoes'],
+                        instructions: 'Layer bacon, lettuce, tomato on toasted bread with mayo.'
+                    },
+                    {
+                        id: 'l2',
+                        name: 'Chicken Philly Sandwich',
+                        ingredients: [
+                            { item: 'Chicken Breast', amount: 1.5, unit: 'lbs', category: 'Meat & Seafood' },
+                            { item: 'Bell Peppers', amount: 2, unit: 'large', category: 'Produce' },
+                            { item: 'Onion', amount: 1, unit: 'large', category: 'Produce' },
+                            { item: 'Provolone Cheese', amount: 8, unit: 'slices', category: 'Dairy' },
+                            { item: 'Hoagie Rolls', amount: 4, unit: 'rolls', category: 'Bakery' }
+                        ],
+                        prepTasks: ['Slice chicken thin', 'Cut vegetables'],
+                        instructions: 'Sauté chicken and vegetables, serve on rolls with cheese.'
+                    }
+                ],
+                dinner: [
+                    {
+                        id: 'd1',
+                        name: 'Burgers',
+                        ingredients: [
+                            { item: 'Ground Beef', amount: 1.5, unit: 'lbs', category: 'Meat & Seafood' },
+                            { item: 'Hamburger Buns', amount: 4, unit: 'buns', category: 'Bakery' },
+                            { item: 'Cheese Slices', amount: 4, unit: 'slices', category: 'Dairy' },
+                            { item: 'Lettuce', amount: 1, unit: 'head', category: 'Produce' },
+                            { item: 'Tomatoes', amount: 1, unit: 'large', category: 'Produce' },
+                            { item: 'Onion', amount: 1, unit: 'medium', category: 'Produce' }
+                        ],
+                        prepTasks: ['Form patties', 'Slice vegetables'],
+                        instructions: 'Grill patties 4-5 minutes per side, assemble burgers.'
+                    },
+                    {
+                        id: 'd2',
+                        name: 'Bacon Burgers',
+                        ingredients: [
+                            { item: 'Ground Beef', amount: 1.5, unit: 'lbs', category: 'Meat & Seafood' },
+                            { item: 'Bacon', amount: 8, unit: 'strips', category: 'Meat & Seafood' },
+                            { item: 'Hamburger Buns', amount: 4, unit: 'buns', category: 'Bakery' },
+                            { item: 'Cheese Slices', amount: 4, unit: 'slices', category: 'Dairy' },
+                            { item: 'Lettuce', amount: 1, unit: 'head', category: 'Produce' }
+                        ],
+                        prepTasks: ['Form patties', 'Cook bacon until crispy'],
+                        instructions: 'Grill patties, add cheese and bacon, serve on buns.'
+                    },
+                    {
+                        id: 'd3',
+                        name: 'Tacos',
+                        ingredients: [
+                            { item: 'Ground Beef', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
+                            { item: 'Taco Shells', amount: 12, unit: 'shells', category: 'Pantry & Dry Goods' },
+                            { item: 'Taco Seasoning', amount: 1, unit: 'packet', category: 'Pantry & Dry Goods' },
+                            { item: 'Lettuce', amount: 1, unit: 'head', category: 'Produce' },
+                            { item: 'Tomatoes', amount: 2, unit: 'medium', category: 'Produce' },
+                            { item: 'Shredded Cheese', amount: 1, unit: 'bag', category: 'Dairy' },
+                            { item: 'Sour Cream', amount: 1, unit: 'container', category: 'Dairy' }
+                        ],
+                        prepTasks: ['Brown ground beef', 'Shred lettuce', 'Dice tomatoes'],
+                        instructions: 'Cook seasoned beef, warm shells, assemble tacos.'
+                    },
+                    {
+                        id: 'd4',
+                        name: 'Chicken Nuggets',
+                        ingredients: [
+                            { item: 'Chicken Nuggets', amount: 2, unit: 'lbs', category: 'Frozen' },
+                            { item: 'French Fries', amount: 1, unit: 'bag', category: 'Frozen' },
+                            { item: 'Ketchup', amount: 1, unit: 'bottle', category: 'Pantry & Dry Goods' }
+                        ],
+                        prepTasks: ['Preheat oven to 425°F'],
+                        instructions: 'Bake nuggets and fries according to package directions.'
+                    },
+                    {
+                        id: 'd5',
+                        name: 'Pizza',
+                        ingredients: [
+                            { item: 'Pizza Dough', amount: 1, unit: 'ball', category: 'Bakery' },
+                            { item: 'Pizza Sauce', amount: 1, unit: 'jar', category: 'Pantry & Dry Goods' },
+                            { item: 'Mozzarella Cheese', amount: 2, unit: 'cups', category: 'Dairy' },
+                            { item: 'Pepperoni', amount: 1, unit: 'package', category: 'Meat & Seafood' }
+                        ],
+                        prepTasks: ['Let dough come to room temperature'],
+                        instructions: 'Roll dough, add sauce and toppings, bake at 450°F for 12-15 minutes.'
+                    },
+                    {
+                        id: 'd6',
+                        name: 'Maidrites',
+                        ingredients: [
+                            { item: 'Ground Beef', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
+                            { item: 'Onion', amount: 1, unit: 'medium', category: 'Produce' },
+                            { item: 'Hamburger Buns', amount: 4, unit: 'buns', category: 'Bakery' },
+                            { item: 'Yellow Mustard', amount: 1, unit: 'bottle', category: 'Pantry & Dry Goods' },
+                            { item: 'Pickles', amount: 1, unit: 'jar', category: 'Pantry & Dry Goods' }
+                        ],
+                        prepTasks: ['Dice onion fine'],
+                        instructions: 'Brown ground beef with diced onion, serve loose on buns with mustard and pickles.'
+                    },
+                    {
+                        id: 'd7',
+                        name: 'Grandma\'s Chicken',
+                        ingredients: [
+                            { item: 'Chicken Thighs', amount: 2, unit: 'lbs', category: 'Meat & Seafood' },
+                            { item: 'Flour', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' },
+                            { item: 'Paprika', amount: 1, unit: 'tsp', category: 'Pantry & Dry Goods' },
+                            { item: 'Salt', amount: 1, unit: 'tsp', category: 'Pantry & Dry Goods' },
+                            { item: 'Pepper', amount: 1, unit: 'tsp', category: 'Pantry & Dry Goods' }
+                        ],
+                        prepTasks: ['Season chicken overnight', 'Heat oil to 350°F'],
+                        instructions: 'Coat chicken in seasoned flour, fry until golden brown and cooked through.'
+                    },
+                    {
+                        id: 'd8',
+                        name: 'Buffalo Chicken & Potato Casserole',
+                        ingredients: [
+                            { item: 'Chicken Breast', amount: 2, unit: 'lbs', category: 'Meat & Seafood' },
+                            { item: 'Potatoes', amount: 3, unit: 'lbs', category: 'Produce' },
+                            { item: 'Buffalo Sauce', amount: 1, unit: 'bottle', category: 'Pantry & Dry Goods' },
+                            { item: 'Cheddar Cheese', amount: 2, unit: 'cups', category: 'Dairy' },
+                            { item: 'Cream Cheese', amount: 8, unit: 'oz', category: 'Dairy' }
+                        ],
+                        prepTasks: ['Cook and shred chicken', 'Slice potatoes thin'],
+                        instructions: 'Layer potatoes and buffalo chicken, top with cheese, bake at 375°F for 45 minutes.'
+                    },
+                    {
+                        id: 'd9',
+                        name: 'Cheesy Chicken & Rice',
+                        ingredients: [
+                            { item: 'Chicken Breast', amount: 1.5, unit: 'lbs', category: 'Meat & Seafood' },
+                            { item: 'White Rice', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' },
+                            { item: 'Chicken Broth', amount: 4, unit: 'cups', category: 'Pantry & Dry Goods' },
+                            { item: 'Cheddar Cheese', amount: 2, unit: 'cups', category: 'Dairy' },
+                            { item: 'Mixed Vegetables', amount: 1, unit: 'bag', category: 'Frozen' }
+                        ],
+                        prepTasks: ['Cook rice with broth', 'Cut chicken into chunks'],
+                        instructions: 'Combine cooked chicken, rice, vegetables and cheese. Bake until bubbly.'
+                    },
+                    {
+                        id: 'd10',
+                        name: 'Grilled Stuffed Tacos',
+                        ingredients: [
+                            { item: 'Ground Beef', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
+                            { item: 'Large Flour Tortillas', amount: 8, unit: 'tortillas', category: 'Bakery' },
+                            { item: 'Taco Seasoning', amount: 1, unit: 'packet', category: 'Pantry & Dry Goods' },
+                            { item: 'Mexican Cheese Blend', amount: 2, unit: 'cups', category: 'Dairy' },
+                            { item: 'Sour Cream', amount: 1, unit: 'container', category: 'Dairy' }
+                        ],
+                        prepTasks: ['Brown and season ground beef', 'Grate cheese'],
+                        instructions: 'Fill tortillas with beef and cheese, fold and grill until crispy.'
+                    },
+                    {
+                        id: 'd11',
+                        name: 'Nachos',
+                        ingredients: [
+                            { item: 'Tortilla Chips', amount: 1, unit: 'large bag', category: 'Pantry & Dry Goods' },
+                            { item: 'Ground Beef', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
+                            { item: 'Nacho Cheese', amount: 1, unit: 'jar', category: 'Pantry & Dry Goods' },
+                            { item: 'Jalapeños', amount: 1, unit: 'jar', category: 'Pantry & Dry Goods' },
+                            { item: 'Sour Cream', amount: 1, unit: 'container', category: 'Dairy' }
+                        ],
+                        prepTasks: ['Brown ground beef', 'Heat nacho cheese'],
+                        instructions: 'Layer chips with beef and cheese, add toppings.'
+                    },
+                    {
+                        id: 'd12',
+                        name: 'Steak & Potatoes',
+                        ingredients: [
+                            { item: 'Ribeye Steaks', amount: 4, unit: 'steaks', category: 'Meat & Seafood' },
+                            { item: 'Russet Potatoes', amount: 4, unit: 'large', category: 'Produce' },
+                            { item: 'Butter', amount: 4, unit: 'tbsp', category: 'Dairy' },
+                            { item: 'Salt', amount: 1, unit: 'tsp', category: 'Pantry & Dry Goods' },
+                            { item: 'Pepper', amount: 1, unit: 'tsp', category: 'Pantry & Dry Goods' }
+                        ],
+                        prepTasks: ['Bring steaks to room temperature', 'Wash and pierce potatoes'],
+                        instructions: 'Bake potatoes at 425°F for 45 min. Grill steaks to desired doneness.'
+                    },
+                    {
+                        id: 'd13',
+                        name: 'Steak Rice & Gravy',
+                        ingredients: [
+                            { item: 'Cube Steak', amount: 1.5, unit: 'lbs', category: 'Meat & Seafood' },
+                            { item: 'White Rice', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' },
+                            { item: 'Brown Gravy Mix', amount: 2, unit: 'packets', category: 'Pantry & Dry Goods' },
+                            { item: 'Onion', amount: 1, unit: 'medium', category: 'Produce' },
+                            { item: 'Beef Broth', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' }
+                        ],
+                        prepTasks: ['Cook rice', 'Slice onion'],
+                        instructions: 'Brown steak and onions, add broth and gravy mix, simmer. Serve over rice.'
+                    },
+                    {
+                        id: 'd14',
+                        name: 'Italian Beef Sandwiches',
+                        ingredients: [
+                            { item: 'Chuck Roast', amount: 3, unit: 'lbs', category: 'Meat & Seafood' },
+                            { item: 'Italian Seasoning', amount: 2, unit: 'packets', category: 'Pantry & Dry Goods' },
+                            { item: 'Beef Broth', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' },
+                            { item: 'Hoagie Rolls', amount: 6, unit: 'rolls', category: 'Bakery' },
+                            { item: 'Provolone Cheese', amount: 12, unit: 'slices', category: 'Dairy' }
+                        ],
+                        prepTasks: ['Season roast night before', 'Slice rolls'],
+                        instructions: 'Slow cook seasoned roast in broth 8 hours. Shred and serve on rolls with cheese.'
+                    },
+                    {
+                        id: 'd15',
+                        name: 'Hamburger Helper',
+                        ingredients: [
+                            { item: 'Ground Beef', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
+                            { item: 'Hamburger Helper Mix', amount: 1, unit: 'box', category: 'Pantry & Dry Goods' },
+                            { item: 'Milk', amount: 1, unit: 'cup', category: 'Dairy' },
+                            { item: 'Water', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' }
+                        ],
+                        prepTasks: ['Brown ground beef'],
+                        instructions: 'Follow package directions - add water, milk, and sauce mix to browned beef.'
+                    },
+                    {
+                        id: 'd16',
+                        name: 'Fried Chicken Sandwiches',
+                        ingredients: [
+                            { item: 'Chicken Breasts', amount: 4, unit: 'large', category: 'Meat & Seafood' },
+                            { item: 'Flour', amount: 2, unit: 'cups', category: 'Pantry & Dry Goods' },
+                            { item: 'Buttermilk', amount: 2, unit: 'cups', category: 'Dairy' },
+                            { item: 'Brioche Buns', amount: 4, unit: 'buns', category: 'Bakery' },
+                            { item: 'Pickle Chips', amount: 1, unit: 'jar', category: 'Pantry & Dry Goods' }
+                        ],
+                        prepTasks: ['Pound chicken thin', 'Marinate in buttermilk'],
+                        instructions: 'Dredge chicken in seasoned flour, fry until golden. Serve on buns with pickles.'
+                    },
+                    {
+                        id: 'd17',
+                        name: 'Chicken Wraps',
+                        ingredients: [
+                            { item: 'Chicken Strips', amount: 1, unit: 'lb', category: 'Meat & Seafood' },
+                            { item: 'Large Tortillas', amount: 4, unit: 'tortillas', category: 'Bakery' },
+                            { item: 'Lettuce', amount: 1, unit: 'head', category: 'Produce' },
+                            { item: 'Tomatoes', amount: 2, unit: 'medium', category: 'Produce' },
+                            { item: 'Ranch Dressing', amount: 1, unit: 'bottle', category: 'Pantry & Dry Goods' }
+                        ],
+                        prepTasks: ['Cook chicken strips', 'Wash and chop vegetables'],
+                        instructions: 'Fill tortillas with chicken, lettuce, tomatoes and ranch. Roll tightly.'
+                    },
+                    {
+                        id: 'd18',
+                        name: 'Chicken Alfredo',
+                        ingredients: [
+                            { item: 'Chicken Breast', amount: 1.5, unit: 'lbs', category: 'Meat & Seafood' },
+                            { item: 'Fettuccine Pasta', amount: 1, unit: 'lb', category: 'Pantry & Dry Goods' },
+                            { item: 'Heavy Cream', amount: 2, unit: 'cups', category: 'Dairy' },
+                            { item: 'Parmesan Cheese', amount: 1, unit: 'cup', category: 'Dairy' },
+                            { item: 'Garlic', amount: 4, unit: 'cloves', category: 'Produce' }
+                        ],
+                        prepTasks: ['Cook pasta al dente', 'Cut chicken into strips'],
+                        instructions: 'Sauté chicken and garlic, add cream and cheese. Toss with cooked pasta.'
+                    }
+                ]
+            };
+
+            const [meals, setMeals] = useState(() => {
+                const saved = localStorage.getItem('mealPlannerMeals');
+                return saved ? JSON.parse(saved) : initialMeals;
+            });
+
+            const [calendar, setCalendar] = useState(() => {
+                const saved = localStorage.getItem('mealPlannerCalendar');
+                return saved ? JSON.parse(saved) : {};
+            });
+
+            const [editingMeal, setEditingMeal] = useState(null);
+            const [draggedMeal, setDraggedMeal] = useState(null);
+
+            // Save to localStorage whenever data changes
+            useEffect(() => {
+                localStorage.setItem('mealPlannerMeals', JSON.stringify(meals));
+            }, [meals]);
+
+            useEffect(() => {
+                localStorage.setItem('mealPlannerCalendar', JSON.stringify(calendar));
+            }, [calendar]);
+
+            const toggleSection = (section) => {
+                setExpandedSections(prev => ({
+                    ...prev,
+                    [section]: !prev[section]
+                }));
+            };
+
+            const handleDragStart = (e, meal, section) => {
+                setDraggedMeal({ ...meal, section });
+                e.dataTransfer.effectAllowed = 'copy';
+            };
+
+            const handleDragOver = (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+            };
+
+            const handleDrop = (e, day, mealType) => {
+                e.preventDefault();
+                if (draggedMeal) {
+                    const calendarKey = `${day}-${mealType}`;
+                    setCalendar(prev => ({
+                        ...prev,
+                        [calendarKey]: draggedMeal
+                    }));
+                    setDraggedMeal(null);
+                }
+            };
+
+            const removeMealFromCalendar = (day, mealType) => {
+                const calendarKey = `${day}-${mealType}`;
+                setCalendar(prev => {
+                    const newCalendar = { ...prev };
+                    delete newCalendar[calendarKey];
+                    return newCalendar;
+                });
+            };
+
+            const addNewMeal = (section) => {
+                const newMeal = {
+                    id: `${section[0]}${Date.now()}`,
+                    name: 'New Meal',
+                    ingredients: [{ item: '', amount: 1, unit: '', category: 'Pantry & Dry Goods' }],
+                    prepTasks: [],
+                    instructions: ''
+                };
+                setEditingMeal({ ...newMeal, section });
+            };
+
+            const saveMeal = (mealData) => {
+                const { section, ...meal } = mealData;
+                setMeals(prev => ({
+                    ...prev,
+                    [section]: prev[section].map(m => m.id === meal.id ? meal : m)
+                }));
+                setEditingMeal(null);
+            };
+
+            const saveNewMeal = (mealData) => {
+                const { section, ...meal } = mealData;
+                setMeals(prev => ({
+                    ...prev,
+                    [section]: [...prev[section], meal]
+                }));
+                setEditingMeal(null);
+            };
+
+            const deleteMeal = (section, mealId) => {
+                setMeals(prev => ({
+                    ...prev,
+                    [section]: prev[section].filter(m => m.id !== mealId)
+                }));
+            };
+
+            // Generate grocery list
+            const generateGroceryList = () => {
+                const groceryItems = {};
+                
+                Object.entries(calendar).forEach(([key, meal]) => {
+                    if (meal && meal.ingredients) {
+                        meal.ingredients.forEach(ingredient => {
+                            const scaledAmount = (ingredient.amount * familySize) / 4; // Scale from base family of 4
+                            const itemKey = `${ingredient.item}-${ingredient.category}`;
+                            
+                            if (groceryItems[itemKey]) {
+                                groceryItems[itemKey].amount += scaledAmount;
+                            } else {
+                                groceryItems[itemKey] = {
+                                    ...ingredient,
+                                    amount: scaledAmount
+                                };
+                            }
+                        });
+                    }
+                });
+
+                const categorized = {};
+                Object.values(groceryItems).forEach(item => {
+                    if (!categorized[item.category]) {
+                        categorized[item.category] = [];
+                    }
+                    categorized[item.category].push(item);
+                });
+
+                return categorized;
+            };
+
+            // Generate prep tasks
+            const generatePrepTasks = () => {
+                const tasks = [];
+                Object.entries(calendar).forEach(([key, meal]) => {
+                    if (meal && meal.prepTasks) {
+                        const [day, mealType] = key.split('-');
+                        meal.prepTasks.forEach(task => {
+                            tasks.push({
+                                task,
+                                meal: meal.name,
+                                day: parseInt(day),
+                                mealType,
+                                id: `${key}-${task}`
+                            });
+                        });
+                    }
+                });
+                return tasks.sort((a, b) => a.day - b.day);
+            };
+
+            // Generate calendar days
+            const generateCalendarDays = () => {
+                const days = [];
+                for (let i = 1; i <= 28; i++) {
+                    days.push(i);
+                }
+                return days;
+            };
+
+            const days = generateCalendarDays();
+
+            if (editingMeal) {
+                return React.createElement(EditMealForm, {
+                    meal: editingMeal,
+                    onSave: editingMeal.id.includes(Date.now()) ? saveNewMeal : saveMeal,
+                    onCancel: () => setEditingMeal(null)
+                });
+            }
+
+            return React.createElement('div', {
+                className: "min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4"
+            }, 
+                React.createElement('div', {
+                    className: "max-w-7xl mx-auto"
+                },
+                    // Header
+                    React.createElement('div', {
+                        className: "bg-white rounded-xl shadow-lg p-6 mb-6"
+                    },
+                        React.createElement('h1', {
+                            className: "text-3xl font-bold text-gray-800 mb-4"
+                        }, "Family Meal Planner"),
+                        
+                        React.createElement('div', {
+                            className: "flex flex-wrap gap-4 items-center justify-between"
+                        },
+                            React.createElement('div', {
+                                className: "flex items-center gap-2"
+                            },
+                                React.createElement('label', {
+                                    className: "text-sm font-medium text-gray-600"
+                                }, "Family Size:"),
+                                React.createElement('input', {
+                                    type: "number",
+                                    value: familySize,
+                                    onChange: (e) => setFamilySize(parseInt(e.target.value) || 1),
+                                    className: "w-16 px-2 py-1 border border-gray-300 rounded-md text-center",
+                                    min: "1",
+                                    max: "20"
+                                })
+                            ),
+                            
+                            React.createElement('div', {
+                                className: "flex gap-2"
+                            },
+                                React.createElement('button', {
+                                    onClick: () => setActiveView('planner'),
+                                    className: `px-4 py-2 rounded-lg flex items-center gap-2 ${
+                                        activeView === 'planner' ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-700'
+                                    }`
+                                },
+                                    React.createElement(Calendar, { size: 16 }),
+                                    "Planner"
+                                ),
+                                React.createElement('button', {
+                                    onClick: () => setActiveView('grocery'),
+                                    className: `px-4 py-2 rounded-lg flex items-center gap-2 ${
+                                        activeView === 'grocery' ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-700'
+                                    }`
+                                },
+                                    React.createElement(ShoppingCart, { size: 16 }),
+                                    "Grocery List"
+                                ),
+                                React.createElement('button', {
+                                    onClick: () => setActiveView('prep'),
+                                    className: `px-4 py-2 rounded-lg flex items-center gap-2 ${
+                                        activeView === 'prep' ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-700'
+                                    }`
+                                },
+                                    React.createElement(CheckSquare, { size: 16 }),
+                                    "Prep Tasks"
+                                )
+                            )
+                        )
+                    ),
+
+                    // Planner View
+                    activeView === 'planner' && React.createElement('div', {
+                        className: "grid lg:grid-cols-4 gap-6"
+                    },
+                        // Meal Bank
+                        React.createElement('div', {
+                            className: "lg:col-span-1"
+                        },
+                            React.createElement('div', {
+                                className: "bg-white rounded-xl shadow-lg p-6"
+                            },
+                                React.createElement('h2', {
+                                    className: "text-xl font-bold text-gray-800 mb-4"
+                                }, "Meal Bank"),
+                                
+                                Object.entries(meals).map(([section, sectionMeals]) =>
+                                    React.createElement('div', {
+                                        key: section,
+                                        className: "mb-4"
+                                    },
+                                        React.createElement('button', {
+                                            onClick: () => toggleSection(section),
+                                            className: "w-full flex items-center justify-between p-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg hover:from-purple-200 hover:to-pink-200 transition-all"
+                                        },
+                                            React.createElement('span', {
+                                                className: "font-semibold text-gray-800 capitalize"
+                                            }, section),
+                                            React.createElement('div', {
+                                                className: "flex items-center gap-2"
+                                            },
+                                                React.createElement('button', {
+                                                    onClick: (e) => {
+                                                        e.stopPropagation();
+                                                        addNewMeal(section);
+                                                    },
+                                                    className: "p-1 hover:bg-white rounded"
+                                                },
+                                                    React.createElement(Plus, { size: 16 })
+                                                ),
+                                                expandedSections[section] ? 
+                                                    React.createElement(ChevronUp, { size: 20 }) : 
+                                                    React.createElement(ChevronDown, { size: 20 })
+                                            )
+                                        ),
+                                        
+                                        expandedSections[section] && React.createElement('div', {
+                                            className: "mt-2 space-y-2"
+                                        },
+                                            sectionMeals.map((meal) =>
+                                                React.createElement('div', {
+                                                    key: meal.id,
+                                                    draggable: true,
+                                                    onDragStart: (e) => handleDragStart(e, meal, section),
+                                                    className: "p-3 bg-gray-50 rounded-lg cursor-move hover:bg-gray-100 transition-colors group"
+                                                },
+                                                    React.createElement('div', {
+                                                        className: "flex items-center justify-between"
+                                                    },
+                                                        React.createElement('span', {
+                                                            className: "text-sm font-medium text-gray-700"
+                                                        }, meal.name),
+                                                        React.createElement('div', {
+                                                            className: "flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        },
+                                                            React.createElement('button', {
+                                                                onClick: () => setEditingMeal({ ...meal, section }),
+                                                                className: "p-1 hover:bg-gray-200 rounded"
+                                                            },
+                                                                React.createElement(Edit3, { size: 12 })
+                                                            ),
+                                                            React.createElement('button', {
+                                                                onClick: () => deleteMeal(section, meal.id),
+                                                                className: "p-1 hover:bg-red-200 rounded text-red-600"
+                                                            },
+                                                                React.createElement(Trash2, { size: 12 })
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+
+                        // Calendar
+                        React.createElement('div', {
+                            className: "lg:col-span-3"
+                        },
+                            React.createElement('div', {
+                                className: "bg-white rounded-xl shadow-lg p-6"
+                            },
+                                React.createElement('h2', {
+                                    className: "text-xl font-bold text-gray-800 mb-4"
+                                }, "Monthly Meal Calendar"),
+                                
+                                // Breakfast/Lunch Week
+                                React.createElement('div', {
+                                    className: "mb-6"
+                                },
+                                    React.createElement('h3', {
+                                        className: "text-lg font-semibold text-gray-700 mb-3"
+                                    }, "Week 1 - Breakfast & Lunch"),
+                                    React.createElement('div', {
+                                        className: "grid grid-cols-7 gap-2 mb-4"
+                                    },
+                                        ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day =>
+                                            React.createElement('div', {
+                                                key: day,
+                                                className: "text-center font-medium text-gray-600 py-2"
+                                            }, day)
+                                        )
+                                    ),
+                                    
+                                    React.createElement('div', {
+                                        className: "grid grid-cols-7 gap-2"
+                                    },
+                                        days.slice(0, 7).map(day =>
+                                            React.createElement('div', {
+                                                key: day,
+                                                className: "border rounded-lg p-2 min-h-32"
+                                            },
+                                                React.createElement('div', {
+                                                    className: "text-xs font-medium text-gray-500 mb-2"
+                                                }, `Day ${day}`),
+                                                
+                                                React.createElement('div', {
+                                                    onDragOver: handleDragOver,
+                                                    onDrop: (e) => handleDrop(e, day, 'breakfast'),
+                                                    className: "mb-2 p-1 border-2 border-dashed border-gray-200 rounded min-h-12 text-xs"
+                                                },
+                                                    calendar[`${day}-breakfast`] ?
+                                                        React.createElement('div', {
+                                                            className: "bg-yellow-100 rounded p-1 relative group"
+                                                        },
+                                                            React.createElement('div', {
+                                                                className: "font-medium"
+                                                            }, calendar[`${day}-breakfast`].name),
+                                                            React.createElement('button', {
+                                                                onClick: () => removeMealFromCalendar(day, 'breakfast'),
+                                                                className: "absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                                                            },
+                                                                React.createElement(X, { size: 10 })
+                                                            )
+                                                        ) :
+                                                        React.createElement('div', {
+                                                            className: "text-gray-400 text-center"
+                                                        }, "Breakfast")
+                                                ),
+                                                
+                                                React.createElement('div', {
+                                                    onDragOver: handleDragOver,
+                                                    onDrop: (e) => handleDrop(e, day, 'lunch'),
+                                                    className: "p-1 border-2 border-dashed border-gray-200 rounded min-h-12 text-xs"
+                                                },
+                                                    calendar[`${day}-lunch`] ?
+                                                        React.createElement('div', {
+                                                            className: "bg-blue-100 rounded p-1 relative group"
+                                                        },
+                                                            React.createElement('div', {
+                                                                className: "font-medium"
+                                                            }, calendar[`${day}-lunch`].name),
+                                                            React.createElement('button', {
+                                                                onClick: () => removeMealFromCalendar(day, 'lunch'),
+                                                                className: "absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                                                            },
+                                                                React.createElement(X, { size: 10 })
+                                                            )
+                                                        ) :
+                                                        React.createElement('div', {
+                                                            className: "text-gray-400 text-center"
+                                                        }, "Lunch")
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+
+                                // Dinner Weeks
+                                [0, 1, 2, 3].map(weekIndex =>
+                                    React.createElement('div', {
+                                        key: weekIndex,
+                                        className: "mb-6"
+                                    },
+                                        React.createElement('h3', {
+                                            className: "text-lg font-semibold text-gray-700 mb-3"
+                                        }, `Week ${weekIndex + 1} - Dinners`),
+                                        React.createElement('div', {
+                                            className: "grid grid-cols-7 gap-2"
+                                        },
+                                            days.slice(weekIndex * 7, (weekIndex + 1) * 7).map(day =>
+                                                React.createElement('div', {
+                                                    key: day,
+                                                    className: "border rounded-lg p-2 min-h-20"
+                                                },
+                                                    React.createElement('div', {
+                                                        className: "text-xs font-medium text-gray-500 mb-2"
+                                                    }, `Day ${day}`),
+                                                    React.createElement('div', {
+                                                        onDragOver: handleDragOver,
+                                                        onDrop: (e) => handleDrop(e, day, 'dinner'),
+                                                        className: "p-1 border-2 border-dashed border-gray-200 rounded min-h-12 text-xs"
+                                                    },
+                                                        calendar[`${day}-dinner`] ?
+                                                            React.createElement('div', {
+                                                                className: "bg-green-100 rounded p-1 relative group"
+                                                            },
+                                                                React.createElement('div', {
+                                                                    className: "font-medium"
+                                                                }, calendar[`${day}-dinner`].name),
+                                                                React.createElement('button', {
+                                                                    onClick: () => removeMealFromCalendar(day, 'dinner'),
+                                                                    className: "absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                                                                },
+                                                                    React.createElement(X, { size: 10 })
+                                                                )
+                                                            ) :
+                                                            React.createElement('div', {
+                                                                className: "text-gray-400 text-center"
+                                                            }, "Dinner")
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+
+                    // Grocery List View
+                    activeView === 'grocery' && React.createElement('div', {
+                        className: "bg-white rounded-xl shadow-lg p-6"
+                    },
+                        React.createElement('h2', {
+                            className: "text-xl font-bold text-gray-800 mb-4"
+                        }, `Grocery List (Family of ${familySize})`),
+                        Object.entries(generateGroceryList()).map(([category, items]) =>
+                            React.createElement('div', {
+                                key: category,
+                                className: "mb-6"
+                            },
+                                React.createElement('h3', {
+                                    className: "text-lg font-semibold text-purple-600 mb-3"
+                                }, category),
+                                React.createElement('div', {
+                                    className: "grid md:grid-cols-2 gap-2"
+                                },
+                                    items.map((item, index) =>
+                                        React.createElement('div', {
+                                            key: index,
+                                            className: "flex items-center justify-between p-2 bg-gray-50 rounded"
+                                        },
+                                            React.createElement('span', null, item.item),
+                                            React.createElement('span', {
+                                                className: "text-sm text-gray-600"
+                                            }, `${item.amount.toFixed(item.amount < 1 ? 2 : 1)} ${item.unit}`)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+
+                    // Prep Tasks View
+                    activeView === 'prep' && React.createElement('div', {
+                        className: "bg-white rounded-xl shadow-lg p-6"
+                    },
+                        React.createElement('h2', {
+                            className: "text-xl font-bold text-gray-800 mb-4"
+                        }, "Prep Tasks"),
+                        React.createElement('div', {
+                            className: "space-y-4"
+                        },
+                            generatePrepTasks().map((task) =>
+                                React.createElement('div', {
+                                    key: task.id,
+                                    className: "flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                },
+                                    React.createElement('div', null,
+                                        React.createElement('div', {
+                                            className: "font-medium"
+                                        }, task.task),
+                                        React.createElement('div', {
+                                            className: "text-sm text-gray-600"
+                                        }, `Day ${task.day} - ${task.meal} (${task.mealType})`)
+                                    ),
+                                    React.createElement('input', {
+                                        type: "checkbox",
+                                        className: "w-5 h-5 text-purple-600"
+                                    })
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        // Edit Meal Form Component
+        const EditMealForm = ({ meal, onSave, onCancel }) => {
+            const [formData, setFormData] = useState(meal);
+
+            const updateIngredient = (index, field, value) => {
+                const newIngredients = [...formData.ingredients];
+                newIngredients[index] = { ...newIngredients[index], [field]: value };
+                setFormData({ ...formData, ingredients: newIngredients });
+            };
+
+            const addIngredient = () => {
+                setFormData({
+                    ...formData,
+                    ingredients: [...formData.ingredients, { item: '', amount: 1, unit: '', category: 'Pantry & Dry Goods' }]
+                });
+            };
+
+            const removeIngredient = (index) => {
+                setFormData({
+                    ...formData,
+                    ingredients: formData.ingredients.filter((_, i) => i !== index)
+                });
+            };
+
+            const addPrepTask = () => {
+                setFormData({
+                    ...formData,
+                    prepTasks: [...formData.prepTasks, '']
+                });
+            };
+
+            const updatePrepTask = (index, value) => {
+                const newTasks = [...formData.prepTasks];
+                newTasks[index] = value;
+                setFormData({ ...formData, prepTasks: newTasks });
+            };
+
+            const removePrepTask = (index) => {
+                setFormData({
+                    ...formData,
+                    prepTasks: formData.prepTasks.filter((_, i) => i !== index)
+                });
+            };
+
+            const categories = ['Produce', 'Meat & Seafood', 'Dairy', 'Frozen', 'Pantry & Dry Goods', 'Bakery'];
+
+            return React.createElement('div', {
+                className: "min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4"
+            },
+                React.createElement('div', {
+                    className: "max-w-4xl mx-auto"
+                },
+                    React.createElement('div', {
+                        className: "bg-white rounded-xl shadow-lg p-6"
+                    },
+                        React.createElement('div', {
+                            className: "flex items-center justify-between mb-6"
+                        },
+                            React.createElement('h2', {
+                                className: "text-2xl font-bold text-gray-800"
+                            }, "Edit Meal"),
+                            React.createElement('div', {
+                                className: "flex gap-2"
+                            },
+                                React.createElement('button', {
+                                    onClick: () => onSave(formData),
+                                    className: "px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2 hover:bg-purple-600"
+                                },
+                                    React.createElement(Save, { size: 16 }),
+                                    "Save"
+                                ),
+                                React.createElement('button', {
+                                    onClick: onCancel,
+                                    className: "px-4 py-2 bg-gray-300 text-gray-700 rounded-lg"
+                                }, "Cancel")
+                            )
+                        ),
+
+                        React.createElement('div', {
+                            className: "space-y-6"
+                        },
+                            // Meal Name
+                            React.createElement('div', null,
+                                React.createElement('label', {
+                                    className: "block text-sm font-medium text-gray-700 mb-2"
+                                }, "Meal Name"),
+                                React.createElement('input', {
+                                    type: "text",
+                                    value: formData.name,
+                                    onChange: (e) => setFormData({ ...formData, name: e.target.value }),
+                                    className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                })
+                            ),
+
+                            // Ingredients
+                            React.createElement('div', null,
+                                React.createElement('div', {
+                                    className: "flex items-center justify-between mb-3"
+                                },
+                                    React.createElement('label', {
+                                        className: "block text-sm font-medium text-gray-700"
+                                    }, "Ingredients"),
+                                    React.createElement('button', {
+                                        onClick: addIngredient,
+                                        className: "px-3 py-1 bg-purple-500 text-white rounded text-sm flex items-center gap-1"
+                                    },
+                                        React.createElement(Plus, { size: 14 }),
+                                        "Add"
+                                    )
+                                ),
+                                React.createElement('div', {
+                                    className: "space-y-3"
+                                },
+                                    formData.ingredients.map((ingredient, index) =>
+                                        React.createElement('div', {
+                                            key: index,
+                                            className: "grid grid-cols-1 md:grid-cols-5 gap-2 items-center"
+                                        },
+                                            React.createElement('input', {
+                                                type: "text",
+                                                placeholder: "Item",
+                                                value: ingredient.item,
+                                                onChange: (e) => updateIngredient(index, 'item', e.target.value),
+                                                className: "px-2 py-2 border border-gray-300 rounded-md text-sm"
+                                            }),
+                                            React.createElement('input', {
+                                                type: "number",
+                                                placeholder: "Amount",
+                                                value: ingredient.amount,
+                                                onChange: (e) => updateIngredient(index, 'amount', parseFloat(e.target.value) || 0),
+                                                className: "px-2 py-2 border border-gray-300 rounded-md text-sm"
+                                            }),
+                                            React.createElement('input', {
+                                                type: "text",
+                                                placeholder: "Unit",
+                                                value: ingredient.unit,
+                                                onChange: (e) => updateIngredient(index, 'unit', e.target.value),
+                                                className: "px-2 py-2 border border-gray-300 rounded-md text-sm"
+                                            }),
+                                            React.createElement('select', {
+                                                value: ingredient.category,
+                                                onChange: (e) => updateIngredient(index, 'category', e.target.value),
+                                                className: "px-2 py-2 border border-gray-300 rounded-md text-sm"
+                                            },
+                                                categories.map(cat =>
+                                                    React.createElement('option', {
+                                                        key: cat,
+                                                        value: cat
+                                                    }, cat)
+                                                )
+                                            ),
+                                            React.createElement('button', {
+                                                onClick: () => removeIngredient(index),
+                                                className: "px-2 py-2 bg-red-500 text-white rounded-md text-sm"
+                                            },
+                                                React.createElement(Trash2, { size: 14 })
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+
+                            // Prep Tasks
+                            React.createElement('div', null,
+                                React.createElement('div', {
+                                    className: "flex items-center justify-between mb-3"
+                                },
+                                    React.createElement('label', {
+                                        className: "block text-sm font-medium text-gray-700"
+                                    }, "Prep Tasks"),
+                                    React.createElement('button', {
+                                        onClick: addPrepTask,
+                                        className: "px-3 py-1 bg-purple-500 text-white rounded text-sm flex items-center gap-1"
+                                    },
+                                        React.createElement(Plus, { size: 14 }),
+                                        "Add"
+                                    )
+                                ),
+                                React.createElement('div', {
+                                    className: "space-y-2"
+                                },
+                                    formData.prepTasks.map((task, index) =>
+                                        React.createElement('div', {
+                                            key: index,
+                                            className: "flex gap-2 items-center"
+                                        },
+                                            React.createElement('input', {
+                                                type: "text",
+                                                placeholder: "Prep task",
+                                                value: task,
+                                                onChange: (e) => updatePrepTask(index, e.target.value),
+                                                className: "flex-1 px-2 py-2 border border-gray-300 rounded-md text-sm"
+                                            }),
+                                            React.createElement('button', {
+                                                onClick: () => removePrepTask(index),
+                                                className: "px-2 py-2 bg-red-500 text-white rounded-md text-sm"
+                                            },
+                                                React.createElement(Trash2, { size: 14 })
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+
+                            // Instructions
+                            React.createElement('div', null,
+                                React.createElement('label', {
+                                    className: "block text-sm font-medium text-gray-700 mb-2"
+                                }, "Instructions"),
+                                React.createElement('textarea', {
+                                    value: formData.instructions,
+                                    onChange: (e) => setFormData({ ...formData, instructions: e.target.value }),
+                                    rows: 4,
+                                    className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500",
+                                    placeholder: "Cooking instructions..."
+                                })
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        ReactDOM.render(React.createElement(MealPlanner), document.getElementById('root'));
+    </script>
+</body>
+</html>
